@@ -34,6 +34,7 @@ import banner from "./slices/banner";
 import news from "./slices/news";
 import superAdmin from "./slices/superAdmin";
 import tenantConfig from "./slices/tenantConfig";
+import walletReducer from "./slices/walletSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -70,6 +71,7 @@ export const store = configureStore({
     news: news,
     superAdmin: superAdmin,
     tenantConfig: tenantConfig,
+    wallet: walletReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -72,6 +72,7 @@ import ViewNews from "./pages/News/ViewNews";
 import ManageQuestions from "./pages/PersonalityTest/ManageQuestions";
 import AITool from "./pages/AITool/AITool";
 import TenantsPage from "./pages/SuperAdmin/TenantsPage";
+import TenantDetailPage from "./pages/SuperAdmin/TenantDetailPage";
 import PlansPage from "./pages/SuperAdmin/PlansPage";
 import PayoutsPage from "./pages/SuperAdmin/PayoutsPage";
 import SchoolSettings from "./pages/TenantAdmin/SchoolSettings";
@@ -337,6 +338,7 @@ export default function App() {
 
               {/* Super Admin */}
               <Route path="/super-admin/tenants" element={<TenantsPage />} />
+              <Route path="/super-admin/tenants/:tenantId" element={<TenantDetailPage />} />
               <Route path="/super-admin/plans" element={<PlansPage />} />
               <Route path="/super-admin/payouts" element={<PayoutsPage />} />
 

@@ -99,6 +99,11 @@ interface SuperAdminState {
     actionLoading: boolean;
     actionError: string | null;
     actionSuccess: string | null;
+
+    // Tenant Detail
+    currentTenant: any | null;
+    currentTenantLoading: boolean;
+    currentTenantError: string | null;
 }
 
 const initialState: SuperAdminState = {
@@ -124,6 +129,10 @@ const initialState: SuperAdminState = {
     actionLoading: false,
     actionError: null,
     actionSuccess: null,
+
+    currentTenant: null,
+    currentTenantLoading: false,
+    currentTenantError: null,
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -155,6 +164,22 @@ export const fetchTenants = createAsyncThunk(
         }
     }
 );
+
+export const fetchTenantById = createAsyncThunk(
+    "superAdmin/fetchTenantById",
+    async (tenantId: string, { rejectWithValue }) => {
+        try {
+            const res = await axiosInstance.get(
+                `/tenant/super-admin/tenants/${tenantId}`,
+                { headers: superAdminHeaders() }
+            );
+            return res.data;
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data?.message || err.message);
+        }
+    }
+);
+
 
 export const createTenant = createAsyncThunk(
     "superAdmin/createTenant",
@@ -433,6 +458,20 @@ const superAdminSlice = createSlice({
             .addCase(fetchTenants.rejected, (s, a) => {
                 s.tenantsLoading = false;
                 s.tenantsError = a.payload as string;
+            })
+
+            .addCase(fetchTenantById.pending, (s) => {
+                s.currentTenantLoading = true;
+                s.currentTenantError = null;
+                s.currentTenant = null;
+            })
+            .addCase(fetchTenantById.fulfilled, (s, a) => {
+                s.currentTenantLoading = false;
+                s.currentTenant = a.payload.data;
+            })
+            .addCase(fetchTenantById.rejected, (s, a) => {
+                s.currentTenantLoading = false;
+                s.currentTenantError = a.payload as string;
             })
 
             .addCase(createTenant.pending, (s) => {

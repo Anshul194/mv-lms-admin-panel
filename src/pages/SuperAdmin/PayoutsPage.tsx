@@ -9,6 +9,7 @@ import {
     type PayoutSummaryItem,
     type PayoutTransaction,
 } from "../../store/slices/superAdmin";
+import { fetchAllWithdrawals, approveWithdrawal, rejectWithdrawal } from "../../store/slices/walletSlice";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import {
@@ -25,6 +26,10 @@ import {
     X,
     Check,
     Building2,
+    CreditCard,
+    ArrowRightLeft,
+    Clock,
+    XCircle
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -145,7 +150,11 @@ const PayoutsPage: React.FC = () => {
         actionLoading, actionSuccess, actionError,
     } = useSelector((s: RootState) => s.superAdmin);
 
-    const [activeTab, setActiveTab] = useState<"summary" | "transactions">("summary");
+    const {
+        withdrawals, loading: walletLoading, error: walletError
+    } = useSelector((s: RootState) => s.wallet);
+
+    const [activeTab, setActiveTab] = useState<"summary" | "transactions" | "withdrawals">("summary");
     const [txFilters, setTxFilters] = useState({ payoutStatus: "pending", tenantId: "" });
     const [selectedTxIds, setSelectedTxIds] = useState<string[]>([]);
     const [settleOpen, setSettleOpen] = useState(false);
@@ -153,6 +162,8 @@ const PayoutsPage: React.FC = () => {
     useEffect(() => {
         if (activeTab === "summary") {
             dispatch(fetchPayoutSummary());
+        } else if (activeTab === "withdrawals") {
+            dispatch(fetchAllWithdrawals());
         } else {
             loadTransactions(1);
         }
@@ -250,12 +261,12 @@ const PayoutsPage: React.FC = () => {
 
                 {/* Tabs */}
                 <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 mb-6 w-fit">
-                    {(["summary", "transactions"] as const).map((tab) => (
+                    {(["summary", "transactions", "withdrawals"] as const).map((tab) => (
                         <button key={tab} onClick={() => setActiveTab(tab)}
                             className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab
                                 ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                                 : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"}`}>
-                            {tab === "summary" ? "Commission Summary" : "Transactions"}
+                            {tab === "summary" ? "Commission Summary" : tab === "transactions" ? "Transactions" : "Withdrawal Requests"}
                         </button>
                     ))}
                 </div>
@@ -391,8 +402,8 @@ const PayoutsPage: React.FC = () => {
                                                     </td>
                                                     <td className="px-4 py-4">
                                                         <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${tx.payoutStatus === "settled"
-                                                                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                                                : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                                                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                                                            : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
                                                             }`}>
                                                             <span className={`w-1.5 h-1.5 rounded-full ${tx.payoutStatus === "settled" ? "bg-green-500" : "bg-yellow-500"}`} />
                                                             {tx.payoutStatus}
@@ -429,6 +440,84 @@ const PayoutsPage: React.FC = () => {
                             )}
                         </div>
                     </>
+                )}
+
+                {/* ── Withdrawals Tab ──────────────────────────────────────────────── */}
+                {activeTab === "withdrawals" && !walletLoading && (
+                    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm mt-6">
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+                                <thead>
+                                    <tr className="bg-gray-50 dark:bg-gray-800 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        <th className="px-6 py-4">Request ID</th>
+                                        <th className="px-6 py-4">Tenant</th>
+                                        <th className="px-6 py-4">Amount</th>
+                                        <th className="px-6 py-4">Date</th>
+                                        <th className="px-6 py-4">Status</th>
+                                        <th className="px-6 py-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
+                                    {withdrawals?.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                                                <CreditCard className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                                                No withdrawal requests found.
+                                            </td>
+                                        </tr>
+                                    ) : withdrawals?.map((w) => (
+                                        <tr key={w._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                            <td className="px-6 py-4 font-mono text-xs text-gray-500">{w._id}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="font-semibold text-gray-900 dark:text-white">{w.tenantId?.name}</div>
+                                                <div className="text-xs text-gray-500">{w.tenantId?.slug}</div>
+                                            </td>
+                                            <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">₹{w.amount?.toLocaleString()}</td>
+                                            <td className="px-6 py-4 text-gray-500">{new Date(w.requestedAt).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4">
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${w.status === "completed" ? "bg-green-100 text-green-700" : w.status === "pending" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>
+                                                    {w.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-right space-x-2">
+                                                {w.status === "pending" && (
+                                                    <>
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await dispatch(approveWithdrawal({ id: w._id })).unwrap();
+                                                                    toast.success("Approved withdrawal");
+                                                                    dispatch(fetchAllWithdrawals());
+                                                                } catch (err: any) { toast.error(err); }
+                                                            }}
+                                                            className="px-3 py-1.5 text-xs font-bold text-green-700 bg-green-100 hover:bg-green-200 rounded-lg transition-colors"
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                const note = prompt("Reason for rejection:");
+                                                                if (note !== null) {
+                                                                    try {
+                                                                        await dispatch(rejectWithdrawal({ id: w._id, adminNote: note })).unwrap();
+                                                                        toast.success("Rejected withdrawal");
+                                                                        dispatch(fetchAllWithdrawals());
+                                                                    } catch (err: any) { toast.error(err); }
+                                                                }
+                                                            }}
+                                                            className="px-3 py-1.5 text-xs font-bold text-red-700 bg-red-100 hover:bg-red-200 rounded-lg transition-colors"
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 )}
             </div>
 

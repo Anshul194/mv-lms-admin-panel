@@ -14,6 +14,7 @@ import {
 import { setCredentials } from "../../store/slices/authslice";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
+import { Link, useNavigate } from "react-router-dom";
 import {
     Building2,
     Plus,
@@ -31,6 +32,7 @@ import {
     Users,
     Calendar,
     Zap,
+    Eye,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -571,7 +573,9 @@ const TenantsPage: React.FC = () => {
                                                         {t.name.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{t.name}</p>
+                                                        <Link to={`/super-admin/tenants/${t._id}`} className="text-sm font-semibold text-gray-900 dark:text-white hover:text-indigo-600 transition-colors">
+                                                            {t.name}
+                                                        </Link>
                                                         <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                                                             <Globe className="w-3 h-3" />{t.slug}
                                                             {t.subdomain && <span className="ml-1 text-gray-400">· {t.subdomain}</span>}
@@ -604,6 +608,10 @@ const TenantsPage: React.FC = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
+                                                    <Link to={`/super-admin/tenants/${t._id}`} title="View Details"
+                                                        className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+                                                        <Eye className="w-4 h-4" />
+                                                    </Link>
                                                     <button onClick={() => setChangePlanTenant(t)} title="Change Plan"
                                                         className="p-1.5 text-purple-500 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors">
                                                         <TrendingUp className="w-4 h-4" />
