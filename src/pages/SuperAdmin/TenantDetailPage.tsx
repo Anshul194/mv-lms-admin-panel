@@ -180,7 +180,57 @@ const TenantDetailPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Tab Contents */}
+                {/* Compact Account Summary */}
+                <div className="px-8 -mt-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center gap-4">
+                            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center text-emerald-600">
+                                <DollarSign className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Available Balance</p>
+                                <p className="text-2xl font-black text-emerald-600 mt-1">₹{(currentTenant.wallet?.balance || 0).toLocaleString()}</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center gap-4">
+                            <div className="w-12 h-12 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center text-amber-600">
+                                <Calendar className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Pending Withdrawals</p>
+                                <p className="text-2xl font-black text-amber-600 mt-1">₹{(currentTenant.wallet?.pendingWithdrawal || 0).toLocaleString()}</p>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => setActiveTab("students")}
+                            className="text-left bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center gap-4 hover:shadow-md transition-all"
+                        >
+                            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center text-indigo-600">
+                                <Users className="w-6 h-6" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Students</p>
+                                <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{currentTenant.students?.length || 0} total</p>
+                                <div className="text-xs text-gray-500 mt-2">
+                                    {currentTenant.students && currentTenant.students.length > 0 ? (
+                                        <>
+                                            {currentTenant.students.slice(0, 3).map((s: any) => (
+                                                <span key={s._id} className="inline-block mr-2">{s.fullName}</span>
+                                            ))}
+                                            {currentTenant.students.length > 3 && <span className="opacity-70">+{currentTenant.students.length - 3} more</span>}
+                                        </>
+                                    ) : (
+                                        <span>No students yet</span>
+                                    )}
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Tab Contents */}
             <div className="transition-all duration-500 ease-in-out">
                 {activeTab === "overview" && (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
