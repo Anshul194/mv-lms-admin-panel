@@ -616,10 +616,12 @@ const TenantsPage: React.FC = () => {
                                                         className="p-1.5 text-purple-500 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors">
                                                         <TrendingUp className="w-4 h-4" />
                                                     </button>
-                                                    <button onClick={() => setImpersonateTarget(t)} title="Impersonate"
-                                                        className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
-                                                        <Zap className="w-4 h-4" />
-                                                    </button>
+                                                    {t.ownerUserId && (
+                                                        <button onClick={() => setImpersonateTarget(t)} title="Impersonate"
+                                                            className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
+                                                            <Zap className="w-4 h-4" />
+                                                        </button>
+                                                    )}
                                                     {t.isActive ? (
                                                         <button onClick={() => setSuspendTenantTarget(t)} title="Suspend"
                                                             className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">

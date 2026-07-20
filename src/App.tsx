@@ -104,6 +104,12 @@ const CreateCertificateTemplate = lazy(
   () => import("./pages/Certification/CreateCertificateTemplate")
 );
 
+// Standalone Test Series
+const CategoryManagement = lazy(() => import("./pages/TestSeriesStandalone/CategoryManagement"));
+const SeriesManagement = lazy(() => import("./pages/TestSeriesStandalone/SeriesManagement"));
+const TestManagement = lazy(() => import("./pages/TestSeriesStandalone/TestManagement"));
+const QuestionManagement = lazy(() => import("./pages/TestSeriesStandalone/QuestionManagement"));
+
 // Simple modal wrapper for SignIn
 function SignInModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   if (!open) return null;
@@ -219,6 +225,12 @@ export default function App() {
               {/* Quiz */}
               <Route path="/quiz/all" element={<QuizList />} />
               <Route path="/quiz/edit/:quizId" element={<EditQuiz />} />
+
+              {/* Standalone Test Series */}
+              <Route path="/test-series-standalone/categories" element={<CategoryManagement />} />
+              <Route path="/test-series-standalone/series/:categoryId" element={<SeriesManagement />} />
+              <Route path="/test-series-standalone/tests/:seriesId" element={<TestManagement />} />
+              <Route path="/test-series-standalone/questions/:testId" element={<QuestionManagement />} />
 
               {/* Assignments */}
               <Route path="/assignments/all" element={<AssignmentList />} />

@@ -18,7 +18,7 @@ import {
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
-import { Files, Tag, UserCircle2Icon, Bell, MessageCircle, Bot, ShieldCheck, Building2, Layers, IndianRupee, Settings2, Wallet, Palette, CreditCard, Zap } from "lucide-react";
+import { Files, Tag, UserCircle2Icon, Bell, MessageCircle, Bot, ShieldCheck, Building2, Layers, IndianRupee, Settings2, Wallet, Palette, CreditCard, Zap, Trophy, Brain } from "lucide-react";
 
 type NavSubItem = {
   name: string;
@@ -43,11 +43,29 @@ const dashboardItems: NavItem[] = [
   },
 ];
 
+const studentItems: NavItem[] = [
+  {
+    icon: <TaskIcon />,
+    name: "Test Series",
+    path: "/test-series/all",
+  },
+  {
+    icon: <Trophy />,
+    name: "Leaderboard",
+    path: "/leaderboard",
+  },
+];
+
 const lmsItems: NavItem[] = [
   {
     icon: <ListIcon />,
     name: "Courses",
     path: "/courses/all/courses",
+  },
+  {
+    icon: <Brain />,
+    name: "Test Series",
+    path: "/test-series-standalone/categories",
   },
   {
     icon: <BoxCubeIcon />,
@@ -589,6 +607,16 @@ const AppSidebar: React.FC = () => {
             {tenantRole !== "platform_superadmin" && userRole !== "news_editor" && (
               <div>
                 {renderMenuItems(dashboardItems, "dash")}
+              </div>
+            )}
+
+            {/* Student Flow */}
+            {tenantRole !== "platform_superadmin" && (
+              <div>
+                <h2 className={`mb-3 px-3 text-[10px] font-black uppercase tracking-widest text-gray-400 ${!isExpanded && !isHovered ? "lg:hidden" : "block"}`}>
+                  Student Portal
+                </h2>
+                {renderMenuItems(studentItems, "student")}
               </div>
             )}
 
